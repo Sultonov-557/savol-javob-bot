@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@grammyjs/conversations": "^1.1.2",
+    "dotenv": "^16.3.1",
+    "envalid": "^8.0.0",
+    "fs": "^0.0.1-security",
+    "grammy": "^1.19.2",
+    "path": "^0.12.7"
+  }
+}
