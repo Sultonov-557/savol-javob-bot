@@ -4,7 +4,9 @@ import { join } from "path";
 import { User } from "./entity/user.entity";
 
 const users: User[] = JSON.parse(fs.readFileSync(join(__dirname, "../../src/database/users.json")).toLocaleString());
-const questions: Question[] = JSON.parse(fs.readFileSync(join(__dirname, "../../src/database/questions.json")).toLocaleString());
+const questions: Question[] = JSON.parse(
+	fs.readFileSync(join(__dirname, "../../src/database/questions.json")).toLocaleString()
+);
 
 const themes: string[] = [];
 
@@ -14,7 +16,27 @@ for (let i of questions) {
 	}
 }
 
-export function getThemes() {}
+export function getThemes() {
+	return themes;
+}
+
+export function getQuestionsByTheme(theme: string) {
+	const themedQuestions: Question[] = [];
+	for (let i of questions) {
+		if (i.theme == theme) {
+			themedQuestions.push(i);
+		}
+	}
+	return themedQuestions;
+}
+
+export function getQuestionsByID(id: number) {
+	for (let i of questions) {
+		if (i.id == id) {
+			return i;
+		}
+	}
+}
 
 export function newQuestion(question: Question) {
 	if (!themes.includes(question.theme)) {
