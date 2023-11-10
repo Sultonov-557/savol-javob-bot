@@ -19,7 +19,15 @@ bot.use(conversations());
 bot.use(createConversation(addQuestion, { id: "addQuestion" }));
 
 bot.command("start", (ctx) => {
-	ctx.reply("salom botga hush kelibsiz");
+	ctx.reply("salom botga hush kelibsiz buyruqlarni ro'yhati uchun /help dan foydalaning");
+});
+
+bot.command("help", (ctx) => {
+	if (ctx.from?.id == env.ADMIN_ID) {
+		ctx.reply("/addQuestion - yangi savol qoshish");
+	} else {
+		ctx.reply("");
+	}
 });
 
 bot.command("myid", adminGuard, (ctx) => {
@@ -28,8 +36,12 @@ bot.command("myid", adminGuard, (ctx) => {
 	}
 });
 
-bot.command("addQuestion", adminGuard, (ctx) => {
+bot.command("yangiSavol", adminGuard, (ctx) => {
 	console.log("hello");
 
 	ctx.conversation.enter("addQuestion");
+});
+
+bot.command("savol",(ctx)=>{
+	
 });

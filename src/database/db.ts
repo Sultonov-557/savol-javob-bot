@@ -6,7 +6,20 @@ import { User } from "./entity/user.entity";
 const users: User[] = JSON.parse(fs.readFileSync(join(__dirname, "../../src/database/users.json")).toLocaleString());
 const questions: Question[] = JSON.parse(fs.readFileSync(join(__dirname, "../../src/database/questions.json")).toLocaleString());
 
+const themes: string[] = [];
+
+for (let i of questions) {
+	if (!themes.includes(i.theme)) {
+		themes.push(i.theme);
+	}
+}
+
+export function getThemes() {}
+
 export function newQuestion(question: Question) {
+	if (!themes.includes(question.theme)) {
+		themes.push(question.theme);
+	}
 	questions.push(question);
 }
 

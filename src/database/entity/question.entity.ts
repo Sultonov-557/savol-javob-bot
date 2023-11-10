@@ -1,14 +1,14 @@
 export class Question {
 	public id: number;
-	public title: string;
+	public theme: string;
 	public text: string;
 	public answers: string[];
 	public rightAnswer: string;
-	constructor(id: number, title: string, text: string, answers: string[], rightAnswer: string) {
+	constructor(id: number, text: string, answers: string[], rightAnswer: string, theme: string) {
 		this.id = id;
-		this.title = title;
 		this.text = text;
 		this.answers = answers;
 		this.rightAnswer = rightAnswer;
+		this.theme = theme.toLowerCase();
 	}
 }

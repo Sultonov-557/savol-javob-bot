@@ -4,9 +4,9 @@ import { Question } from "../../database/entity/question.entity";
 import { newQuestion } from "../../database/db";
 
 export async function addQuestion(conversation: NewConversation, ctx: NewContext) {
-	//title
+	//theme
 	ctx.reply("savol mavzusini yuboring");
-	const title = await conversation.form.text();
+	const theme = await conversation.form.text();
 
 	//question
 	ctx.reply("savolni yuboring");
@@ -30,6 +30,6 @@ export async function addQuestion(conversation: NewConversation, ctx: NewContext
 			i++;
 		}
 	}
-	const question = new Question(Date.now(), title, text, answers, rightAnswer);
+	const question = new Question(Date.now(), text, answers, rightAnswer, theme);
 	newQuestion(question);
 }
