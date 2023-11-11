@@ -111,13 +111,15 @@ bot.command("savol", (ctx) => {
 bot.on("callback_query", (ctx) => {
   const data = ctx.callbackQuery.data;
 
+  console.log(data);
+
   if (data?.startsWith("getThemes_")) {
     const page = +data.replace("getThemes_", "");
     const themes = db.getThemes(page);
     const keyboard = new InlineKeyboard();
 
     for (let i in themes) {
-      keyboard.text(themes[i], `theme_${themes[i]}_1`);
+      keyboard.text(themes[i], `themes_${themes[i]}_1`);
       if (+i == 2 || +i == 5) {
         keyboard.row();
       }
