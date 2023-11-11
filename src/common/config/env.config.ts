@@ -6,4 +6,6 @@ config();
 export const env = cleanEnv(process.env, {
   TOKEN: str(),
   ADMIN_ID: num(),
+  CHANNEL_ID: num(),
+  CHANNEL_LINK: str(),
 });
