@@ -30,6 +30,6 @@ export async function addQuestion(conversation: NewConversation, ctx: NewContext
 			i++;
 		}
 	}
-	const question = new Question(Date.now(), text, answers, rightAnswer, theme);
-	newQuestion(question);
+
+	newQuestion({ answers, rightAnswer, text, theme });
 }
