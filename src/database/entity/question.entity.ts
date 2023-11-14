@@ -1,14 +1,19 @@
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity()
 export class Question {
-	public id: number;
-	public theme: string;
-	public text: string;
-	public answers: string[];
-	public rightAnswer: string;
-	constructor(id: number, text: string, answers: string[], rightAnswer: string, theme: string) {
-		this.id = id;
-		this.text = text;
-		this.answers = answers;
-		this.rightAnswer = rightAnswer;
-		this.theme = theme.toLowerCase();
-	}
+  @PrimaryGeneratedColumn()
+  public ID: number;
+
+  @Column()
+  public theme: string;
+
+  @Column()
+  public text: string;
+
+  @Column()
+  public answers: string;
+
+  @Column()
+  public rightAnswer: string;
 }

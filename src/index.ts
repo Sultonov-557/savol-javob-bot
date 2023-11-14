@@ -4,12 +4,13 @@ import { adminGuard } from "./common/guards/admin.guard";
 import { NewContext } from "./common/types/Context.type";
 import { conversations, createConversation } from "@grammyjs/conversations";
 import { addQuestion } from "./common/conversations/addQuestion.conversation";
-import * as db from "./database/db";
 import { channelGuard } from "./common/guards/channel.guard";
+import * as db from "./database/db";
 import { userGuard } from "./common/guards/user.guard";
 import { Result } from "./database/entity/results.entity";
 
 const bot = new Bot<NewContext>(env.TOKEN);
+
 bot.start({ drop_pending_updates: true });
 
 bot.use(
@@ -37,22 +38,22 @@ bot.command("help", (ctx) => {
   }
 });
 
-bot.command("users", adminGuard, (ctx) => {
+bot.command("users", adminGuard, async (ctx) => {
   let list = "";
-  const users = db.getUsers();
+  const users = await db.getUsers();
   for (let i of users) {
-    list += `id: ${i.id} ism: ${i.name}`;
+    list += `id: ${i.ID} ism: ${i.name}`;
   }
   ctx.reply(list);
 });
 
-bot.hears(/\/user (\d+)/, adminGuard, (ctx) => {
+bot.hears(/\/user (\d+)/, adminGuard, async (ctx) => {
   const userID = +ctx.match[1];
-  const user = db.getUser(userID);
+  const user = await db.getUser(userID + "");
   if (user) {
     let text = `ism: ${user.name}\nball: ${user.score}\njavoblar:\n`;
     for (let i of user.results) {
-      const question = db.getQuestionsByID(i.questionID);
+      const question = await db.getQuestionByID(i.question.ID);
       if (question) {
         const date = `${i.answerTime.getHours()}:${i.answerTime.getMinutes()} ${i.answerTime.toDateString()}`;
         text += `${question.text} ${date} `;
@@ -69,10 +70,10 @@ bot.hears(/\/user (\d+)/, adminGuard, (ctx) => {
   }
 });
 
-bot.command("me", (ctx) => {
+bot.command("me", async (ctx) => {
   let text = `ism: ${ctx.user.name}\nball: ${ctx.user.score}\njavoblar:\n`;
   for (let i of ctx.user.results) {
-    const question = db.getQuestionsByID(i.questionID);
+    const question = await db.getQuestionByID(i.question.ID);
     if (question) {
       const date = `${i.answerTime.getHours()}:${i.answerTime.getMinutes()} ${i.answerTime.toDateString()}`;
       text += `${question.text} ${date} `;
@@ -90,32 +91,30 @@ bot.command("yangiSavol", adminGuard, (ctx) => {
   ctx.conversation.enter("addQuestion");
 });
 
-bot.command("savol", (ctx) => {
-  const themes = db.getThemes(1);
+bot.command("savol", async (ctx) => {
+  const themes = await db.getThemes(1);
   const keyboard = new InlineKeyboard();
 
   for (let i in themes) {
-    keyboard.text(themes[i], `theme_${themes[i]}`);
+    keyboard.text(themes[i], `themes_${themes[i]}`);
     if (+i == 2 || +i == 5) {
       keyboard.row();
     }
   }
 
-  if (db.getAllThemes().length > 9) {
+  if ((await db.getAllThemes()).length > 9) {
     keyboard.row();
     keyboard.text("->", "getThemes_2");
   }
   ctx.reply("mavzulardan birini tanlang", { reply_markup: keyboard });
 });
 
-bot.on("callback_query", (ctx) => {
+bot.on("callback_query", async (ctx) => {
   const data = ctx.callbackQuery.data;
-
-  console.log(data);
 
   if (data?.startsWith("getThemes_")) {
     const page = +data.replace("getThemes_", "");
-    const themes = db.getThemes(page);
+    const themes = await db.getThemes(page);
     const keyboard = new InlineKeyboard();
 
     for (let i in themes) {
@@ -124,12 +123,13 @@ bot.on("callback_query", (ctx) => {
         keyboard.row();
       }
     }
+
     keyboard.row();
 
     if (page != 1) {
       keyboard.text("<-", `getThemes_${page - 1}`);
     }
-    if (db.getAllThemes().length > 9 * page) {
+    if ((await db.getAllThemes()).length > 9 * page) {
       keyboard.text("->", `getThemes_${page + 1}`);
     }
 
@@ -139,10 +139,10 @@ bot.on("callback_query", (ctx) => {
   if (data?.startsWith("themes_")) {
     const args = data.replace("themes_", "");
     const [theme, page] = args.split("_");
-    const questions = db.getQuestionsByTheme(theme, +page);
+    const questions = await db.getQuestionsByTheme(theme, +page);
     const keyboard = new InlineKeyboard();
     for (let i in questions) {
-      keyboard.text(questions[i].text, `question_${questions[i].id}`);
+      keyboard.text(questions[i].text, `question_${questions[i].ID}`);
       if (+i == 2 || +i == 5) {
         keyboard.row();
       }
@@ -153,7 +153,7 @@ bot.on("callback_query", (ctx) => {
     if (+page != 1) {
       keyboard.text("<-", `themes_${theme}_${+page - 1}`);
     }
-    if (db.getAllQuestionsByTheme(theme).length > 9 * +page) {
+    if ((await db.getAllQuestionsByTheme(theme)).length > 9 * +page) {
       keyboard.text("->", `themes_${theme}_${+page + 1}`);
     }
 
@@ -161,10 +161,10 @@ bot.on("callback_query", (ctx) => {
   }
   if (data?.startsWith("question_")) {
     const questionID = +data.replace("question_", "");
-    const question = db.getQuestionsByID(questionID);
+    const question = await db.getQuestionByID(questionID);
     if (!question) return;
 
-    if (db.isAnswered(ctx.user.id, question.id)) {
+    if (await db.isAnswered(ctx.user.ID, question.ID)) {
       ctx.answerCallbackQuery("bu savolga allaqachon javob bergansiz");
       return;
     }
@@ -185,15 +185,15 @@ bot.on("callback_query", (ctx) => {
     const args = data.replace("answerto_", "").split("_");
     const questionID = +args[0];
     const answer = args[1];
-    const question = db.getQuestionsByID(questionID);
+    const question = await db.getQuestionByID(questionID);
     if (question) {
       if (question.rightAnswer == answer) {
         ctx.editMessageText("to'g'ri javob");
-        ctx.user.results.push(new Result(question.id, true));
+        db.newResult({ questionID: question.ID, answerTime: new Date(), correct: true });
         ctx.user.score += 1;
       } else {
         ctx.editMessageText("javob noto'g'ri");
-        ctx.user.results.push(new Result(question.id, false));
+        db.newResult({ questionID: question.ID, answerTime: new Date(), correct: false });
         ctx.user.score -= 1;
       }
     }

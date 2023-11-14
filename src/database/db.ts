@@ -1,131 +1,74 @@
-import * as fs from "fs";
+import { AppDataSource } from "../common/config/database.config";
 import { Question } from "./entity/question.entity";
-import { join } from "path";
+import { Result } from "./entity/results.entity";
 import { User } from "./entity/user.entity";
 
-const users: User[] = JSON.parse(fs.readFileSync(join(__dirname, "../../src/database/users.json")).toLocaleString());
-const questions: Question[] = JSON.parse(fs.readFileSync(join(__dirname, "../../src/database/questions.json")).toLocaleString());
+AppDataSource.initialize();
 
-const themes: string[] = [
-  "segtasergva",
-  "faswefvgswegdv",
-  "sawegfsedf",
-  "awfasedgvswerdgv",
-  "wsedgvsderfgvedrafgb",
-  "wsfazwsfvawsf",
-  "awsfcvazsfc",
-  "segtasergva",
-  "faswefvgswegdv",
-  "sawegfsedf",
-  "awfasedgvswerdgv",
-  "wsedgvsderfgvedrafgb",
-  "wsfazwsfvawsf",
-  "awsfcvazsfc",
-  "segtasergva",
-  "faswefvgswegdv",
-  "sawegfsedf",
-  "awfasedgvswerdgv",
-  "wsedgvsderfgvedrafgb",
-  "wsfazwsfvawsf",
-  "awsfcvazsfc",
-];
+const userRepo = AppDataSource.getRepository(User);
+const questionRepo = AppDataSource.getRepository(Question);
+const resultRepo = AppDataSource.getRepository(Result);
 
-for (let i of questions) {
-  if (!themes.includes(i.theme)) {
-    themes.push(i.theme);
-  }
+export async function getUser(ID: string) {
+  return await userRepo.findOneBy({ ID });
 }
 
-export function getUser(id: number) {
-  for (let i of users) {
-    if (i.id == id) {
-      return i;
+export async function isAnswered(userID: string, questionID: number) {
+  return await userRepo.exist({ where: { ID: userID, results: { question: { ID: questionID } } } });
+}
+
+export async function getUsers() {
+  return await userRepo.find();
+}
+export async function newUser(ID: string, name: string) {
+  const user = userRepo.create({ ID, name });
+  await userRepo.save(user);
+  return user;
+}
+
+export async function getThemes(page: number, limit: number = 9) {
+  const questions = await questionRepo.find({ take: limit, skip: limit * page });
+  const themes: string[] = [];
+  questions.forEach((v) => {
+    if (themes.includes(v.theme)) {
+      themes.push(v.theme);
     }
-  }
-}
-
-export function isAnswered(userID: number, questionID: number) {
-  const user = getUser(userID);
-  if (user) {
-    for (let i of user.results) {
-      if ((i.questionID = questionID)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-export function getUsers() {
-  return users;
-}
-
-export function newUser(user: User) {
-  users.push(user);
-}
-
-export function getThemes(page: number, limit: number = 9) {
-  const list = [];
-  for (let i = limit * (page - 1); i < limit * (page - 1) + limit; i++) {
-    if (themes[i]) {
-      list.push(themes[i]);
-    }
-  }
-  return list;
-}
-
-export function getAllThemes() {
+  });
   return themes;
 }
 
-export function getQuestionsByTheme(theme: string, page: number, limit: number = 9) {
-  const themedQuestions: Question[] = [];
-  for (let i of questions) {
-    if (i.theme == theme) {
-      themedQuestions.push(i);
+export async function getAllThemes() {
+  const questions = await questionRepo.find();
+  const themes: string[] = [];
+  questions.forEach((v) => {
+    if (themes.includes(v.theme)) {
+      themes.push(v.theme);
     }
-  }
-
-  const list = [];
-
-  for (let i = limit * (page - 1); i < limit * (page - 1) + limit; i++) {
-    if (themedQuestions[i]) {
-      list.push(themedQuestions[i]);
-    }
-  }
-
-  return list;
+  });
+  return themes;
 }
 
-export function getAllQuestionsByTheme(theme: string) {
-  const themedQuestions: Question[] = [];
-  for (let i of questions) {
-    if (i.theme == theme) {
-      themedQuestions.push(i);
-    }
+export async function getQuestionsByTheme(theme: string, page: number, limit: number = 9) {
+  return await questionRepo.find({ where: { theme }, skip: limit * page, take: limit });
+}
+
+export async function getAllQuestionsByTheme(theme: string) {
+  return await questionRepo.find({ where: { theme } });
+}
+
+export async function getQuestionByID(ID: number) {
+  return await questionRepo.findOneBy({ ID });
+}
+export async function newQuestion(arg: { answers: string[]; rightAnswer: string; text: string; theme: string }) {
+  const { answers, rightAnswer, theme, text } = arg;
+  const question = questionRepo.create({ answers: JSON.stringify(answers), rightAnswer, text, theme });
+}
+
+export async function newResult(arg: { questionID: number; answerTime: Date; correct: boolean }) {
+  const { answerTime, correct, questionID } = arg;
+  const question = await questionRepo.findOneBy({ ID: questionID });
+  if (question) {
+    const result = resultRepo.create({ answerTime, correct, question });
+    resultRepo.save(result);
   }
-  return themedQuestions;
 }
-
-export function getQuestionsByID(id: number) {
-  for (let i of questions) {
-    if (i.id == id) {
-      return i;
-    }
-  }
-}
-
-export function newQuestion(question: Question) {
-  if (!themes.includes(question.theme)) {
-    themes.push(question.theme);
-  }
-  questions.push(question);
-}
-
-export function save() {
-  fs.writeFileSync(join(__dirname, "../../src/database/questions.json"), JSON.stringify(questions, null, 4));
-  fs.writeFileSync(join(__dirname, "../../src/database/users.json"), JSON.stringify(users, null, 4));
-  console.log("saved");
-}
-
-setInterval(save, 1 * 1000 * 60);

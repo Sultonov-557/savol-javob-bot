@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@types/node": "^20.8.10",
+    "@types/node": "^20.9.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
@@ -9,6 +9,8 @@
     "envalid": "^8.0.0",
     "fs": "^0.0.1-security",
     "grammy": "^1.19.2",
-    "path": "^0.12.7"
+    "mysql": "^2.18.1",
+    "path": "^0.12.7",
+    "typeorm": "^0.3.17"
   }
 }

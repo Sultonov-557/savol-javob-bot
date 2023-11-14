@@ -328,5 +328,16 @@
         ],
         "rightAnswer": "1920",
         "theme": "tarix"
+    },
+    {
+        "id": 1699960773480,
+        "text": "async function nima qaytaradi",
+        "answers": [
+            "returnda nima yozilgan bo’lsa shuni",
+            "Pending holatdagi promise",
+            "Resolve bo’lgan Promise"
+        ],
+        "rightAnswer": "Promise",
+        "theme": "node.js"
     }
 ]

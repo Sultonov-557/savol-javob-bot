@@ -2,6 +2,18 @@
     {
         "id": 5010669787,
         "name": "༺ 𒆜SULTONOV | ST",
+        "score": 1,
+        "results": [
+            {
+                "questionID": 3457358,
+                "correct": true,
+                "answerTime": "2023-11-14T10:58:08.714Z"
+            }
+        ]
+    },
+    {
+        "id": 1899526541,
+        "name": "Akhmed",
         "score": 0,
         "results": []
     }

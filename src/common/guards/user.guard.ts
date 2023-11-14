@@ -1,14 +1,24 @@
 import { InlineKeyboard, NextFunction } from "grammy";
 import { NewContext } from "../types/Context.type";
 import * as db from "../../database/db";
-import { User } from "../../database/entity/user.entity";
 
 export async function userGuard(ctx: NewContext, next: NextFunction) {
   if (ctx.from) {
-    let user = db.getUser(ctx.from.id);
+    let user = await db.getUser(ctx.from.id + "");
     if (!user) {
-      user = new User(ctx.from.id, ctx.from.first_name, 0);
-      db.newUser(user);
+      user = await db.newUser(
+        ctx.from.id + "",
+        ctx.from.first_name
+          .split("")
+          .filter((v) => {
+            if (v.charCodeAt(0) < 100) {
+              return true;
+            } else {
+              return false;
+            }
+          })
+          .join("")
+      );
     }
     ctx.user = user;
   }
