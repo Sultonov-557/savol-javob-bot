@@ -7,7 +7,6 @@ import { addQuestion } from "./common/conversations/addQuestion.conversation";
 import { channelGuard } from "./common/guards/channel.guard";
 import * as db from "./database/db";
 import { userGuard } from "./common/guards/user.guard";
-import { Result } from "./database/entity/results.entity";
 
 const bot = new Bot<NewContext>(env.TOKEN);
 
@@ -99,7 +98,7 @@ bot.command("savol", async (ctx) => {
 	const keyboard = new InlineKeyboard();
 
 	for (let i in themes) {
-		keyboard.text(themes[i], `themes_${themes[i]}`);
+		keyboard.text(themes[i], `themes_${themes[i]}_1`);
 		if (+i == 2 || +i == 5) {
 			keyboard.row();
 		}
@@ -139,12 +138,15 @@ bot.on("callback_query", async (ctx) => {
 		ctx.editMessageText("mavzulardan birini tanlang", { reply_markup: keyboard });
 	}
 
+	//TODO make questions send one by one
+
 	if (data?.startsWith("themes_")) {
-		console.log(data);
 		const args = data.replace("themes_", "");
 		const [theme, page] = args.split("_");
 
-		const questions = await db.getQuestionsByTheme(theme, +(page || "1"));
+		const questions = await db.getQuestionsByTheme(theme, +page);
+		console.log(questions);
+
 		const keyboard = new InlineKeyboard();
 		for (let i in questions) {
 			keyboard.text(questions[i].text, `question_${questions[i].ID}`);

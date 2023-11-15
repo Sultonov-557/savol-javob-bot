@@ -28,7 +28,6 @@ export async function newUser(ID: string, name: string) {
 
 export async function getThemes(page: number, limit: number = 9) {
 	const questions = await questionRepo.find({ take: limit, skip: limit * (page - 1) });
-	console.log(questions);
 
 	const themes: string[] = [];
 	for (let i of questions) {
@@ -51,12 +50,28 @@ export async function getAllThemes() {
 	return themes;
 }
 
+export async function getAllThemesCount() {
+	const questions = await questionRepo.find();
+
+	const themes: string[] = [];
+	for (let i of questions) {
+		if (!themes.includes(i.theme)) {
+			themes.push(i.theme);
+		}
+	}
+	return themes;
+}
+
 export async function getQuestionsByTheme(theme: string, page: number, limit: number = 9) {
-	return await questionRepo.find({ where: { theme }, skip: limit * page, take: limit });
+	return await questionRepo.find({ where: { theme }, skip: limit * (page - 1), take: limit });
 }
 
 export async function getAllQuestionsByTheme(theme: string) {
 	return await questionRepo.find({ where: { theme } });
+}
+
+export async function getAllQuestionsCountByTheme(theme: string) {
+	return await questionRepo.count({ where: { theme } });
 }
 
 export async function getQuestionByID(ID: number) {
