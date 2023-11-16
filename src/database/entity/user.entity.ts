@@ -22,7 +22,7 @@ export class User {
 	@Column({ default: 0 })
 	public score: number;
 
-	@ManyToMany(() => Result)
+	@OneToMany(() => Result, (result) => result.user)
 	@JoinTable()
 	public results: Result[];
 }
