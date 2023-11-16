@@ -1,23 +1,28 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	JoinTable,
+	ManyToMany,
+	OneToMany,
+	OneToOne,
+	PrimaryColumn,
+	PrimaryGeneratedColumn,
+} from "typeorm";
 import { Result } from "./results.entity";
 
 @Entity()
 export class User {
-  @PrimaryColumn()
-  ID: string;
+	@PrimaryColumn()
+	ID: string;
 
-  @Column()
-  public name: string;
+	@Column()
+	public name: string;
 
-  @Column({ default: 0 })
-  public score: number;
+	@Column({ default: 0 })
+	public score: number;
 
-  @OneToMany(
-    () => Result,
-    (result) => {
-      result.ID;
-    }
-  )
-  @JoinColumn()
-  public results: Result[];
+	@ManyToMany(() => Result)
+	@JoinTable()
+	public results: Result[];
 }

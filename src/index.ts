@@ -178,7 +178,7 @@ bot.on("callback_query", async (ctx) => {
 
 		const keyboard = new InlineKeyboard();
 		let allAnswers: string[] = [];
-		allAnswers = allAnswers.concat(question?.answers);
+		allAnswers = allAnswers.concat(JSON.parse(question?.answers));
 		allAnswers.push(question?.rightAnswer);
 		allAnswers.sort();
 		keyboard.text(allAnswers[0], `answerTo_${questionID}_${allAnswers[0]}`);
