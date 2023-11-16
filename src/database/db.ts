@@ -83,9 +83,8 @@ export async function newQuestion(arg: { answers: string[]; rightAnswer: string;
 	questionRepo.save(question);
 }
 
-export async function newResult(arg: { questionID: number; answerTime: Date; correct: boolean }) {
-	const { answerTime, correct, questionID } = arg;
-	const question = await questionRepo.findOneBy({ ID: questionID });
+export async function newResult(arg: { question: Question; answerTime: Date; correct: boolean }) {
+	const { answerTime, correct, question } = arg;
 	if (question) {
 		const result = resultRepo.create({ answerTime, correct, question });
 		resultRepo.save(result);

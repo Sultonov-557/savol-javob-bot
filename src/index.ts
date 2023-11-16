@@ -196,11 +196,11 @@ bot.on("callback_query", async (ctx) => {
 		if (question) {
 			if (question.rightAnswer == answer) {
 				ctx.editMessageText("to'g'ri javob");
-				db.newResult({ questionID: question.ID, answerTime: new Date(), correct: true });
+				db.newResult({ question, answerTime: new Date(), correct: true });
 				ctx.user.score += 1;
 			} else {
 				ctx.editMessageText("javob noto'g'ri");
-				db.newResult({ questionID: question.ID, answerTime: new Date(), correct: false });
+				db.newResult({ question, answerTime: new Date(), correct: false });
 				ctx.user.score -= 1;
 			}
 		}
