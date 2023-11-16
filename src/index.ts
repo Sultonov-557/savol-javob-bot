@@ -145,7 +145,6 @@ bot.on("callback_query", async (ctx) => {
 		const [theme, page] = args.split("_");
 
 		const questions = await db.getQuestionsByTheme(theme, +page);
-		console.log(questions);
 
 		const keyboard = new InlineKeyboard();
 		for (let i in questions) {

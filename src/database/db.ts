@@ -14,7 +14,10 @@ export async function getUser(ID: string) {
 }
 
 export async function isAnswered(userID: string, questionID: number) {
-	return await userRepo.exist({ where: { ID: userID, results: { question: { ID: questionID } } } });
+	const user = await userRepo.findOne({ where: { ID: userID }, relations: ["results"] });
+	console.log(user, userID, questionID);
+
+	return user;
 }
 
 export async function getUsers() {
@@ -85,8 +88,7 @@ export async function newQuestion(arg: { answers: string[]; rightAnswer: string;
 
 export async function newResult(arg: { question: Question; answerTime: Date; correct: boolean }) {
 	const { answerTime, correct, question } = arg;
-	if (question) {
-		const result = resultRepo.create({ answerTime, correct, question });
-		resultRepo.save(result);
-	}
+
+	const result = resultRepo.create({ answerTime, correct, question });
+	resultRepo.save(result);
 }
