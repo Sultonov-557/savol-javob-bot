@@ -12,6 +12,12 @@ const bot = new Bot<NewContext>(env.TOKEN);
 
 bot.start({ drop_pending_updates: true });
 
+//no    no   no no no    no no no
+// no  no    no         no
+//  nono     no no no    no no no
+//   no      no                 no
+//   no      no no no    no no no
+
 bot.use(
   session({
     initial: () => {
@@ -31,9 +37,9 @@ bot.command("start", (ctx) => {
 
 bot.command("help", (ctx) => {
   if (ctx.from?.id == env.ADMIN_ID) {
-    ctx.reply("/yangiSavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> foydalanuvchini javoblarini ko'rish");
+    ctx.reply("/yangiSavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish");
   } else {
-    ctx.reply("/savol - savollarga javob berish");
+    ctx.reply("/savol - savollarga javob berish\n/me - o'zingiz haqida malumot olish");
   }
 });
 
