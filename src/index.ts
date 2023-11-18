@@ -25,6 +25,7 @@ bot.use(
     },
   })
 );
+
 bot.use(conversations());
 bot.use(createConversation(addQuestion, { id: "addQuestion" }));
 
@@ -37,7 +38,7 @@ bot.command("start", (ctx) => {
 
 bot.command("help", (ctx) => {
   if (ctx.from?.id == env.ADMIN_ID) {
-    ctx.reply("/yangiSavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish");
+    ctx.reply("/yangisavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> - foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish");
   } else {
     ctx.reply("/savol - savollarga javob berish\n/me - o'zingiz haqida malumot olish");
   }
@@ -47,7 +48,7 @@ bot.command("users", adminGuard, async (ctx) => {
   let list = "";
   const users = await db.getUsers();
   for (let i of users) {
-    list += `id: ${i.ID} ism: ${i.name}`;
+    list += `id: ${i.ID} ism: ${i.name}\n`;
   }
   ctx.reply(list);
 });
