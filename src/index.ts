@@ -255,7 +255,7 @@ bot.on("callback_query", async (ctx) => {
 				}
 			}
 
-			ctx.reply(`hamma savollarga javob berdingiz\nto'g'ri javoblar: ${right}/${all}\njavob berilgan vaqti: ${time.toLocaleString()}`);
+			ctx.reply(`Hamma savollarga javob berdingiz\nto'g'ri javoblar: ${right}/${all}\njavob berilgan vaqti: ${time.toLocaleString()}`);
 			return;
 		}
 
