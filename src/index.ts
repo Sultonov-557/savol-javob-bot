@@ -7,8 +7,11 @@ import { addQuestion } from "./common/conversations/addQuestion.conversation";
 import { channelGuard } from "./common/guards/channel.guard";
 import * as db from "./database/db";
 import { userGuard } from "./common/guards/user.guard";
+import { formatString } from "./common/utils/stringFormater";
 
 const bot = new Bot<NewContext>(env.TOKEN);
+
+console.log(formatString("hello\neveyrone"));
 
 bot.start({ drop_pending_updates: true });
 
@@ -34,18 +37,24 @@ bot.use(userGuard);
 
 bot.command("start", (ctx) => {
   ctx.reply(
-    "salom botga hush kelibsiz buyruqlarni ro'yhati uchun /help dan foydalaning"
+    formatString(
+      "salom botga hush kelibsiz buyruqlarni ro'yhati uchun /help dan foydalaning"
+    )
   );
 });
 
 bot.command("help", (ctx) => {
   if (ctx.from?.id == env.ADMIN_ID) {
     ctx.reply(
-      "/yangisavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> - foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish"
+      formatString(
+        "/yangisavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> - foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish"
+      )
     );
   } else {
     ctx.reply(
-      "/savol - savollarga javob berish\n/me - o'zingiz haqida malumot olish"
+      formatString(
+        "/savol - savollarga javob berish\n/me - o'zingiz haqida malumot olish"
+      )
     );
   }
 });
