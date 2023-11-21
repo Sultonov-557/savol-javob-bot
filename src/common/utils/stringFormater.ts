@@ -1,19 +1,30 @@
 export function formatString(string: string): string {
   let out = "";
-  const lines = string.split("\n");
-  const maxLenght = Math.max(...lines.map((v) => v.length));
+  let lines = string.split("\n");
+  const maxLength = 45;
 
-  out += "-".repeat(maxLenght + 10) + "\n";
+  lines = lines.map((v, i, a) => {
+    if (v.length > maxLength) {
+      let words = v.split(" ");
+      return;
+    } else {
+      return v;
+    }
+  });
+
+  const topLenght = Math.max(...lines.map((v) => v.length));
+
+  out += "-".repeat(topLenght + 10) + "\n";
 
   for (let i of lines) {
-    const space = Math.floor((maxLenght - i.length) / 2);
-
     out += "|";
-    out += " ".repeat(space + 4) + i + " ".repeat((space || -1) + 5);
+    out += " ".repeat((topLenght - i.length) * 0.6 + 4);
+    out += i;
+    out += " ".repeat((topLenght - i.length) * 0.5 + 4);
     out += "|\n";
   }
 
-  out += "-".repeat(maxLenght + 10);
+  out += "-".repeat(topLenght + 10);
 
   return out;
 }

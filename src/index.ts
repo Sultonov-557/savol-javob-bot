@@ -11,7 +11,8 @@ import { formatString } from "./common/utils/stringFormater";
 
 const bot = new Bot<NewContext>(env.TOKEN);
 
-console.log(formatString("hello\neveyrone"));
+console.log(formatString("oaueijhgvnraoeisdfcugnjrhoaieujrhgvnaasdrgadrgoerhg\n[owsifgjmosrgjmfoiser"));
+
 
 bot.start({ drop_pending_updates: true });
 
@@ -65,7 +66,7 @@ bot.command("users", adminGuard, async (ctx) => {
   for (let i of users) {
     list += `id: ${i.ID} ism: ${i.name}\n`;
   }
-  ctx.reply(list);
+  ctx.reply(formatString(list));
 });
 
 bot.hears(/\/user (\d+)/, adminGuard, async (ctx) => {
@@ -85,7 +86,7 @@ bot.hears(/\/user (\d+)/, adminGuard, async (ctx) => {
         }
       }
     }
-    ctx.reply(text);
+    ctx.reply(formatString(text));
   } else {
     ctx.reply("bunaqa odam topilmadi");
   }
@@ -93,7 +94,7 @@ bot.hears(/\/user (\d+)/, adminGuard, async (ctx) => {
 
 bot.command("me", async (ctx) => {
   let text = `ism: ${ctx.user.name}\nball: ${ctx.user.score}`;
-  ctx.reply(text);
+  ctx.reply(formatString(text));
 
   const themes: any = {};
 
@@ -122,7 +123,9 @@ bot.command("me", async (ctx) => {
     }
 
     ctx.reply(
-      `${i}:\nto'gri javoblar: ${right}/${all}\njavob berilgan vaqt: ${time.toLocaleString()}`
+      formatString(
+        `${i}:\nto'gri javoblar: ${right}/${all}\njavob berilgan vaqt: ${time.toLocaleString()}`
+      )
     );
   }
 });
@@ -147,7 +150,9 @@ bot.command("savol", async (ctx) => {
     keyboard.row();
     keyboard.text("->", "getThemes_2");
   }
-  ctx.reply("mavzulardan birini tanlang", { reply_markup: keyboard });
+  ctx.reply(formatString("mavzulardan birini tanlang"), {
+    reply_markup: keyboard,
+  });
 });
 
 bot.on("callback_query", async (ctx) => {
@@ -175,7 +180,7 @@ bot.on("callback_query", async (ctx) => {
       keyboard.text("->", `getThemes_${page + 1}`);
     }
 
-    ctx.editMessageText("mavzulardan birini tanlang", {
+    ctx.editMessageText(formatString("mavzulardan birini tanlang"), {
       reply_markup: keyboard,
     });
   }
@@ -188,7 +193,9 @@ bot.on("callback_query", async (ctx) => {
     if (!question) return;
 
     if (await db.isAnswered(ctx.user.ID, question.ID)) {
-      ctx.answerCallbackQuery("bu savolga allaqachon javob bergansiz");
+      ctx.answerCallbackQuery(
+        formatString("bu savolga allaqachon javob bergansiz")
+      );
       return;
     }
 
@@ -204,7 +211,9 @@ bot.on("callback_query", async (ctx) => {
     keyboard.text(allAnswers[2], `answerTo_${questionID}_${allAnswers[2]}`);
     keyboard.text(allAnswers[3], `answerTo_${questionID}_${allAnswers[3]}`);
 
-    ctx.editMessageText(question.text, { reply_markup: keyboard });
+    ctx.editMessageText(formatString(question.text), {
+      reply_markup: keyboard,
+    });
   }
   if (data?.startsWith("answerTo_")) {
     const args = data.replace("answerTo_", "").split("_");
