@@ -33,14 +33,20 @@ bot.use(channelGuard);
 bot.use(userGuard);
 
 bot.command("start", (ctx) => {
-  ctx.reply("salom botga hush kelibsiz buyruqlarni ro'yhati uchun /help dan foydalaning");
+  ctx.reply(
+    "salom botga hush kelibsiz buyruqlarni ro'yhati uchun /help dan foydalaning"
+  );
 });
 
 bot.command("help", (ctx) => {
   if (ctx.from?.id == env.ADMIN_ID) {
-    ctx.reply("/yangisavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> - foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish");
+    ctx.reply(
+      "/yangisavol - yangi savol qoshish\n/users - foydalanuvchilar ro'yhatini olish\n/user <id> - foydalanuvchini javoblarini ko'rish\n/savol - savollarga javob berish\n/me - o'zingiz haqingizda malumot olish"
+    );
   } else {
-    ctx.reply("/savol - savollarga javob berish\n/me - o'zingiz haqida malumot olish");
+    ctx.reply(
+      "/savol - savollarga javob berish\n/me - o'zingiz haqida malumot olish"
+    );
   }
 });
 
@@ -77,23 +83,39 @@ bot.hears(/\/user (\d+)/, adminGuard, async (ctx) => {
 });
 
 bot.command("me", async (ctx) => {
-  let text = `ism: ${ctx.user.name}\nball: ${ctx.user.score}\njavoblar:\n`;
+  let text = `ism: ${ctx.user.name}\nball: ${ctx.user.score}`;
+  ctx.reply(text);
+
+  const themes: any = {};
 
   for (let i in ctx.user.results) {
     const result = ctx.user.results[i];
 
     const question = await db.getQuestionByID(result.question.ID);
-    if (question) {
-      const date = `${result.answerTime.getHours()}:${result.answerTime.getMinutes()} ${result.answerTime.toDateString()}`;
-      text += `${question.text} ${date} `;
-      if (result.correct) {
-        text += "to'g'ri javob\n";
-      } else {
-        text += "noto'g'ri javob\n";
-      }
+    if (!question) return;
+
+    if (Object.keys(themes).includes(question.theme)) {
+      themes[question.theme].push(result);
+    } else {
+      themes[question.theme] = [result];
     }
   }
-  ctx.reply(text);
+
+  for (let i in themes) {
+    const theme = themes[i];
+    const time: Date = theme[0].answerTime;
+    const all = theme.length;
+    let right = 0;
+    for (let i in theme) {
+      if (theme[i].correct) {
+        right++;
+      }
+    }
+
+    ctx.reply(
+      `${i}:\nto'gri javoblar: ${right}/${all}\njavob berilgan vaqt: ${time.toLocaleString()}`
+    );
+  }
 });
 
 bot.command("yangisavol", adminGuard, (ctx) => {
@@ -106,7 +128,7 @@ bot.command("savol", async (ctx) => {
   const keyboard = new InlineKeyboard();
 
   for (let i in themes) {
-    keyboard.text(themes[i], `themes_${themes[i]}_1`);
+    keyboard.text(themes[i], `themes_${themes[i]}`);
     if (+i == 2 || +i == 5) {
       keyboard.row();
     }
@@ -128,7 +150,7 @@ bot.on("callback_query", async (ctx) => {
     const keyboard = new InlineKeyboard();
 
     for (let i in themes) {
-      keyboard.text(themes[i], `themes_${themes[i]}_1`);
+      keyboard.text(themes[i], `themes_${themes[i]}`);
       if (+i == 2 || +i == 5) {
         keyboard.row();
       }
@@ -144,39 +166,15 @@ bot.on("callback_query", async (ctx) => {
       keyboard.text("->", `getThemes_${page + 1}`);
     }
 
-    ctx.editMessageText("mavzulardan birini tanlang", { reply_markup: keyboard });
+    ctx.editMessageText("mavzulardan birini tanlang", {
+      reply_markup: keyboard,
+    });
   }
 
   if (data?.startsWith("themes_")) {
-    const args = data.replace("themes_", "");
-    const [theme, page] = args.split("_");
-
-    const questions = await db.getQuestionsByTheme(theme, +page);
-
-    const keyboard = new InlineKeyboard();
-    for (let i in questions) {
-      keyboard.text(questions[i].text, `question_${questions[i].ID}`);
-      if (+i == 2 || +i == 5) {
-        keyboard.row();
-      }
-    }
-
-    keyboard.row();
-
-    if (page && +page != 1) {
-      keyboard.text("<-", `themes_${theme}_${+page - 1}`);
-    }
-
-    keyboard.text("back", "getThemes_1");
-
-    if ((await db.getAllQuestionsByTheme(theme)).length > 9 * +page) {
-      keyboard.text("->", `themes_${theme}_${+page + 1}`);
-    }
-
-    ctx.editMessageText("savollardan birini tanlang", { reply_markup: keyboard });
-  }
-  if (data?.startsWith("question_")) {
-    const questionID = +data.replace("question_", "");
+    const theme = data.replace("themes_", "");
+    const questionID = await db.getNextQuestion(ctx.user, theme);
+    if (!questionID) return;
     const question = await db.getQuestionByID(questionID);
     if (!question) return;
 
@@ -191,7 +189,9 @@ bot.on("callback_query", async (ctx) => {
     allAnswers.push(question?.rightAnswer);
     allAnswers.sort();
     keyboard.text(allAnswers[0], `answerTo_${questionID}_${allAnswers[0]}`);
-    keyboard.text(allAnswers[1], `answerTo_${questionID}_${allAnswers[1]}`).row();
+    keyboard
+      .text(allAnswers[1], `answerTo_${questionID}_${allAnswers[1]}`)
+      .row();
     keyboard.text(allAnswers[2], `answerTo_${questionID}_${allAnswers[2]}`);
     keyboard.text(allAnswers[3], `answerTo_${questionID}_${allAnswers[3]}`);
 
@@ -211,15 +211,31 @@ bot.on("callback_query", async (ctx) => {
     }
 
     if (question.rightAnswer == answer) {
-      await db.newResult({ user: ctx.user, question, answerTime: new Date(), correct: true });
+      await db.newResult({
+        user: ctx.user,
+        question,
+        answerTime: new Date(),
+        correct: true,
+      });
       ctx.user.score += 1;
     } else {
-      await db.newResult({ user: ctx.user, question, answerTime: new Date(), correct: false });
-      ctx.user.score -= 1;
+      await db.newResult({
+        user: ctx.user,
+        question,
+        answerTime: new Date(),
+        correct: false,
+      });
+      if (ctx.user.score != 0) {
+        ctx.user.score -= 1;
+      }
     }
     await db.saveUser(ctx.user);
 
-    const nextQuestionID = await db.getNextQuestion(ctx.user, question.theme, question.ID);
+    const nextQuestionID = await db.getNextQuestion(
+      ctx.user,
+      question.theme,
+      question.ID
+    );
 
     if (!nextQuestionID) {
       const currentKeyboard = new InlineKeyboard();
@@ -238,18 +254,19 @@ bot.on("callback_query", async (ctx) => {
 
       ctx.editMessageText(question.text, { reply_markup: currentKeyboard });
 
-      let out = "hamma savolarga javob berdingiz:\n";
       const results = await db.getResultsByTheme(ctx.user.ID, question.theme);
+      const time = results[0].answerTime;
+      const all = results.length;
+      let right = 0;
       for (let i in results) {
-        const result = results[i];
-        out += `${result.question.text} - `;
-        if (result.correct) {
-          out += "tog'ri\n";
-        } else {
-          out += "no tog'ri\n";
+        if (results[i].correct) {
+          right++;
         }
       }
-      ctx.reply(out);
+
+      ctx.reply(
+        `hamma savollarga javob berdingiz\nto'g'ri javoblar: ${right}/${all}\njavob berilgan vaqti: ${time.toLocaleString()}`
+      );
       return;
     }
 
@@ -262,10 +279,21 @@ bot.on("callback_query", async (ctx) => {
     nextAnswers.push(nextQuestion.rightAnswer);
     nextAnswers.sort();
 
-    nextKeyboard.text(nextAnswers[0], `answerTo_${nextQuestion.ID}_${nextAnswers[0]}`);
-    nextKeyboard.text(nextAnswers[1], `answerTo_${nextQuestion.ID}_${nextAnswers[1]}`).row();
-    nextKeyboard.text(nextAnswers[2], `answerTo_${nextQuestion.ID}_${nextAnswers[2]}`);
-    nextKeyboard.text(nextAnswers[3], `answerTo_${nextQuestion.ID}_${nextAnswers[3]}`);
+    nextKeyboard.text(
+      nextAnswers[0],
+      `answerTo_${nextQuestion.ID}_${nextAnswers[0]}`
+    );
+    nextKeyboard
+      .text(nextAnswers[1], `answerTo_${nextQuestion.ID}_${nextAnswers[1]}`)
+      .row();
+    nextKeyboard.text(
+      nextAnswers[2],
+      `answerTo_${nextQuestion.ID}_${nextAnswers[2]}`
+    );
+    nextKeyboard.text(
+      nextAnswers[3],
+      `answerTo_${nextQuestion.ID}_${nextAnswers[3]}`
+    );
 
     const currentKeyboard = new InlineKeyboard();
     let allAnswers: string[] = [];
