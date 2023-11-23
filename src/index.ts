@@ -114,7 +114,7 @@ bot.command("me", async (ctx) => {
     }
 
     ctx.reply(
-      `${i}:\nto'gri javoblar: ${right}/${all}\njavob berilgan vaqt: ${time.toLocaleString()}`
+      `${i}:\nTo'gri javoblar: ${right}/${all}\nJavob berilgan vaqt: ${time.toLocaleString()}`
     );
   }
 });
@@ -139,7 +139,7 @@ bot.command("savol", async (ctx) => {
     keyboard.row();
     keyboard.text("->", "getThemes_2");
   }
-  ctx.reply("mavzulardan birini tanlang", {
+  ctx.reply("Mavzulardan birini tanlang", {
     reply_markup: keyboard,
   });
 });
@@ -169,7 +169,7 @@ bot.on("callback_query", async (ctx) => {
       keyboard.text("->", `getThemes_${page + 1}`);
     }
 
-    ctx.editMessageText("mavzulardan birini tanlang", {
+    ctx.editMessageText("Mavzulardan birini tanlang", {
       reply_markup: keyboard,
     });
   }
@@ -182,7 +182,7 @@ bot.on("callback_query", async (ctx) => {
     if (!question) return;
 
     if (await db.isAnswered(ctx.user.ID, question.ID)) {
-      ctx.answerCallbackQuery("bu savolga allaqachon javob bergansiz");
+      ctx.answerCallbackQuery("Bu savolga allaqachon javob bergansiz");
       return;
     }
 
@@ -211,7 +211,7 @@ bot.on("callback_query", async (ctx) => {
     if (!question) return;
 
     if (await db.isAnswered(ctx.user.ID, question.ID)) {
-      ctx.answerCallbackQuery("bu savolga allaqachon javob bergansiz");
+      ctx.answerCallbackQuery("Bu savolga allaqachon javob bergansiz");
       return;
     }
 
@@ -267,7 +267,7 @@ bot.on("callback_query", async (ctx) => {
       }
 
       ctx.reply(
-        `Hamma savollarga javob berdingiz\nto'g'ri javoblar: ${right}/${all}\njavob berilgan vaqti: ${time.toLocaleString()}`
+        `Hamma savollarga javob berdingiz✅\nTo'g'ri javoblar🏆: ${right}/${all}\nJavob berilgan vaqti🕐: ${time.toLocaleString()}`
       );
       return;
     }
