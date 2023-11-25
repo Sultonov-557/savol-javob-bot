@@ -8,15 +8,15 @@ export async function addQuestion(
   ctx: NewContext
 ) {
   //theme
-  ctx.reply("savol mavzusini yuboring");
+  ctx.reply("Savol mavzusini yuboring");
   const theme = await conversation.form.text();
 
   //question
-  ctx.reply("savolni yuboring");
+  ctx.reply("Savolni yuboring");
   const text = await conversation.form.text();
 
   //question right answer
-  ctx.reply("tog'ri javobni yuboring");
+  ctx.reply("Tog'ri javobni yuboring");
   const rightAnswer = await conversation.form.text();
 
   //answers
@@ -27,7 +27,7 @@ export async function addQuestion(
     const answer = await conversation.form.text();
 
     if (answers.includes(answer) || rightAnswer == answer) {
-      ctx.reply("bu javob allaqachon mavjud");
+      ctx.reply("Bu javob allaqachon mavjud");
     } else {
       answers.push(answer);
       i++;
