@@ -114,7 +114,7 @@ bot.command("me", async (ctx) => {
     }
 
     ctx.reply(
-      `${i}:\nTo'gri javoblar: ${right}/${all}\nJavob berilgan vaqt: ${time.toLocaleString()}`
+      `${i}📚:\nTo'gri javoblar✅: ${right}/${all}\nJavob berilgan vaqt🕐: ${time.toLocaleString()}`
     );
   }
 });
